@@ -39,6 +39,9 @@ public class UsuarioEntity {
     @Column(name = "livros_lidos")
     private int livrosLidos;
 
+    @Column(name = "autor_preferido")
+    private String autorPreferido;
+
     @Column(name = "nivel_leitura")
     private String nivelLeitura;
 

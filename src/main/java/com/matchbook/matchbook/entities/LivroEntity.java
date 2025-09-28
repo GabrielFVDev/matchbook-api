@@ -28,6 +28,9 @@ public class LivroEntity {
     @Column(name = "editora")
     private String editora;
 
+    @Column(name = "genero")
+    private String genero;
+
     @Column(name = "ano_publicacao")
     private int anoPublicacao;
 
