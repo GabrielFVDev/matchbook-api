@@ -14,6 +14,14 @@ public class LivroService {
     @Autowired
     LivroRepository livroRepository;
 
+    public Optional<LivroEntity> getLivro(Integer id) {
+        return livroRepository.findById(id);
+    }
+
+    public List<LivroEntity> getAllLivros() {
+        return livroRepository.findAll();
+    }
+
     public LivroEntity createLivro() {
         LivroEntity livro = livroRepository.save(new LivroEntity());
         return livro;
@@ -26,13 +34,5 @@ public class LivroService {
 
     public void deleteLivro(Integer id) {
         livroRepository.deleteById(id);
-    }
-
-    public Optional<LivroEntity> getLivro(Integer id) {
-        return livroRepository.findById(id);
-    }
-
-    public List<LivroEntity> getAllLivros() {
-        return livroRepository.findAll();
     }
 }
