@@ -22,9 +22,8 @@ public class LivroService {
         return livroRepository.findAll();
     }
 
-    public LivroEntity createLivro() {
-        LivroEntity livro = livroRepository.save(new LivroEntity());
-        return livro;
+    public LivroEntity createLivro(LivroEntity livro) {
+        return livroRepository.save(livro);
     }
 
     public LivroEntity updateLivro(LivroEntity livro) {
