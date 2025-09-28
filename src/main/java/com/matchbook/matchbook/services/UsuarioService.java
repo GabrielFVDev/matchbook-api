@@ -15,9 +15,8 @@ public class UsuarioService {
     @Autowired
     UsuarioRepository usuarioRepository;
 
-    public UsuarioEntity createUsuario() {
-        UsuarioEntity usuario = usuarioRepository.save(new UsuarioEntity());
-        return usuario;
+    public UsuarioEntity createUsuario(UsuarioEntity usuario) {
+        return usuarioRepository.save(usuario);
     }
 
     public UsuarioEntity updateUsuario(UsuarioEntity usuario) {
