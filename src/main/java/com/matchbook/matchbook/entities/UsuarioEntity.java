@@ -49,6 +49,9 @@ public class UsuarioEntity {
     @Column(name = "receber_recomendacoes")
     private boolean receberRecomendacoes;
 
+    @Column(name = "foto_url")
+    private String fotoUrl;
+
     @Column(name = "data_cadastro")
     private Date dataCadastro;
 

@@ -44,4 +44,10 @@ public class UsuarioController {
     public ResponseEntity<Iterable<UsuarioEntity>> getAllUsuarios() {
         return ResponseEntity.ok(usuarioService.getAllUsuarios());
     }
+
+    @PutMapping("/{id}/foto")
+    public ResponseEntity<UsuarioEntity> updateFoto(@PathVariable Integer id, @RequestBody String fotoUrl) {
+        UsuarioEntity usuario = usuarioService.updateFotoUsuario(id, fotoUrl);
+        return ResponseEntity.ok(usuario);
+    }
 }

@@ -58,4 +58,7 @@ public class LivroEntity {
 
     @Column(name = "data_cadastro")
     private Date dataCadastro;
+
+    @Column(name = "foto_url")
+    private String fotoUrl;
 }

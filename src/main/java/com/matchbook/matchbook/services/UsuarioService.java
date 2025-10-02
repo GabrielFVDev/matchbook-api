@@ -16,6 +16,9 @@ public class UsuarioService {
     UsuarioRepository usuarioRepository;
 
     public UsuarioEntity createUsuario(UsuarioEntity usuario) {
+        if (usuario.getFotoUrl() == null || usuario.getFotoUrl().isEmpty()) {
+            usuario.setFotoUrl(generateDefaultPhoto(usuario.getNome()));
+        }
         return usuarioRepository.save(usuario);
     }
 
@@ -33,5 +36,23 @@ public class UsuarioService {
 
     public List<UsuarioEntity> getAllUsuarios() {
         return usuarioRepository.findAll();
+    }
+
+    public UsuarioEntity updateFotoUsuario(Integer id, String fotoUrl) {
+        Optional<UsuarioEntity> usuarioOpt = usuarioRepository.findById(id);
+        if (usuarioOpt.isPresent()) {
+            UsuarioEntity usuario = usuarioOpt.get();
+            usuario.setFotoUrl(fotoUrl);
+            return usuarioRepository.save(usuario);
+        }
+        throw new RuntimeException("Usuário não encontrado");
+    }
+
+    private String generateDefaultPhoto(String nome) {
+        if (nome != null && !nome.isEmpty()) {
+            String primeiraLetra = nome.substring(0, 1).toUpperCase();
+            return String.format("https://ui-avatars.com/api/?name=%s&background=random&color=fff&size=200", primeiraLetra);
+        }
+        return "https://ui-avatars.com/api/?name=?&background=random&color=fff&size=200";
     }
 }
