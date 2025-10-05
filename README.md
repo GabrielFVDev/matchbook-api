@@ -4,6 +4,7 @@
 ![Java](https://img.shields.io/badge/Java-17-blue)
 ![MySQL](https://img.shields.io/badge/MySQL-8.0-orange)
 ![Maven](https://img.shields.io/badge/Maven-3.8+-red)
+![Docker](https://img.shields.io/badge/Docker-🐳-blue)
 
 ## 🎯 Sobre o Projeto
 
@@ -52,13 +53,21 @@ O sistema calcula um score para cada livro baseado em:
 
 ## 🚀 Como Executar
 
-### Pré-requisitos
+### 🐳 Execução com Docker (Recomendado)
 
-- Java 17+
-- MySQL 8.0+
-- Maven 3.8+
+A forma mais simples de executar o projeto é usando Docker. O sistema já vem configurado com:
 
-### Configuração
+- MySQL 8.0 com dados iniciais
+- Aplicação Spring Boot
+- Configuração de rede automática
+- Dados de exemplo pré-carregados
+
+#### Pré-requisitos Docker
+
+- Docker instalado e rodando
+- Docker Compose instalado
+
+#### Executar com Docker
 
 1. **Clone o repositório**
    ```bash
@@ -66,24 +75,130 @@ O sistema calcula um score para cada livro baseado em:
    cd matchbook
    ```
 
-2. **Configure o banco MySQL**
+2. **Execute o script de build (Linux/Mac)**
+   ```bash
+   chmod +x docker-build.sh
+   ./docker-build.sh
+   ```
+
+3. **Ou execute manualmente os comandos Docker**
+   ```bash
+   # Compilar a aplicação
+   ./mvnw clean package -DskipTests
+   
+   # Limpar containers antigos
+   sudo docker compose down -v
+   
+   # Construir e iniciar
+   sudo docker compose up --build -d
+   ```
+
+4. **Verificar se está rodando**
+   ```bash
+   sudo docker compose ps
+   ```
+
+**✅ Aplicação estará disponível em:** `http://localhost:8080`  
+**📊 MySQL disponível na porta:** `3307`  
+**🗄️ Dados iniciais:** Carregados automaticamente!
+
+#### Comandos Docker Úteis
+
+```bash
+# Ver logs da aplicação
+sudo docker compose logs app -f
+
+# Ver logs do MySQL
+sudo docker compose logs mysql -f
+
+# Parar a aplicação
+sudo docker compose down
+
+# Parar e remover volumes (limpar dados)
+sudo docker compose down -v
+
+# Reiniciar apenas a aplicação
+sudo docker compose restart app
+```
+
+#### Configuração Docker
+
+O projeto utiliza:
+
+- **MySQL**: Porta 3307, usuário `matchbook_user`, senha `matchbook_pass`
+- **Aplicação**: Porta 8080
+- **Volumes**: Dados MySQL persistidos
+- **Rede**: `matchbook-network` para comunicação entre containers
+- **Health Check**: MySQL aguarda estar pronto antes da aplicação iniciar
+- **Encoding**: UTF-8 (suporte a acentos) configurado automaticamente
+
+### 💻 Execução Local (Desenvolvimento)
+
+#### Pré-requisitos Locais
+
+- Java 17+
+- MySQL 8.0+
+- Maven 3.8+
+
+#### Configuração Local
+
+1. **Configure o banco MySQL local**
    ```sql
    CREATE DATABASE matchbook;
+   CREATE USER 'matchbook_user'@'localhost' IDENTIFIED BY 'matchbook_pass';
+   GRANT ALL PRIVILEGES ON matchbook.* TO 'matchbook_user'@'localhost';
+   FLUSH PRIVILEGES;
    ```
 
-3. **Configure application.properties**
+2. **Ajuste application.properties para local**
    ```properties
    spring.datasource.url=jdbc:mysql://localhost:3306/matchbook
-   spring.datasource.username=root
-   spring.datasource.password=sua_senha
+   spring.datasource.username=matchbook_user
+   spring.datasource.password=matchbook_pass
    ```
 
-4. **Execute a aplicação**
+3. **Execute a aplicação**
    ```bash
    ./mvnw spring-boot:run
    ```
 
-A aplicação estará disponível em `http://localhost:8080`
+### 🔧 Solução de Problemas Docker
+
+#### Problema: "docker-compose: comando não encontrado"
+
+```bash
+# Instalar Docker Compose (Ubuntu/Debian)
+sudo apt update
+sudo apt install docker-compose-plugin
+
+# Ou use 'docker compose' (sem hífen) em versões mais novas
+sudo docker compose up --build -d
+```
+
+#### Problema: "Cannot connect to the Docker daemon"
+
+```bash
+# Verificar se Docker está rodando
+sudo systemctl status docker
+
+# Iniciar Docker se necessário
+sudo systemctl start docker
+
+# Adicionar usuário ao grupo docker (opcional, evita sudo)
+sudo usermod -aG docker $USER
+# (necessário logout/login após este comando)
+```
+
+#### Problema: Dados não carregaram
+
+```bash
+# Verificar se init-data.sql foi executado
+sudo docker compose logs mysql | grep -i "init-data"
+
+# Recriar containers com volumes limpos
+sudo docker compose down -v
+sudo docker compose up --build -d
+```
 
 ## 📡 API Endpoints
 
