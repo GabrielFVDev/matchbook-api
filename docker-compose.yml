@@ -1,0 +1,38 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: matchbook-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: matchbook
+      MYSQL_USER: matchbook_user
+      MYSQL_PASSWORD: matchbook_pass
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init-data.sql:/docker-entrypoint-initdb.d/init-data.sql
+    networks:
+      - matchbook-network
+
+  app:
+    build: .
+    container_name: matchbook-app
+    depends_on:
+      - mysql
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/matchbook
+      SPRING_DATASOURCE_USERNAME: matchbook_user
+      SPRING_DATASOURCE_PASSWORD: matchbook_pass
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    networks:
+      - matchbook-network
+
+volumes:
+  mysql_data:
+
+networks:
+  matchbook-network:
+    driver: bridge

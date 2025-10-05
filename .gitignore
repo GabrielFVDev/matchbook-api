@@ -31,3 +31,22 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Maven
+/target/
+!.mvn/wrapper/maven-wrapper.jar
+.mvn/timing.properties
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Docker
+*.pid
+docker-compose.override.yml
+
+# Arquivos de ambiente
+.env
