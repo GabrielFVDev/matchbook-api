@@ -1,4 +1,27 @@
-INSERT INTO livros (titulo, autor, editora, genero, ano_publicacao, numero_paginas, idioma, isbn, sinopse, capa_url, avaliacao_media, disponivel) VALUES
+USE matchbook;
+
+-- Configurar charset UTF-8 para suportar acentos e caracteres especiais
+SET NAMES utf8mb4;
+SET CHARACTER SET utf8mb4;
+
+CREATE TABLE livros (
+    id int AUTO_INCREMENT PRIMARY KEY,
+    titulo VARCHAR(200) NOT NULL,
+    autor VARCHAR(100) NOT NULL,
+    editora VARCHAR(100),
+    genero VARCHAR(50) NOT NULL,
+    ano_publicacao INT,
+    numero_paginas INT,
+    idioma VARCHAR(20) DEFAULT 'Português',
+    isbn VARCHAR(20),
+    sinopse TEXT,
+    capa_url VARCHAR(500),
+    avaliacao_media DECIMAL(3 , 2 ) DEFAULT 0.0,
+    disponivel BOOLEAN DEFAULT TRUE,
+    data_cadastro DATETIME DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+INSERT IGNORE INTO livros (titulo, autor, editora, genero, ano_publicacao, numero_paginas, idioma, isbn, sinopse, capa_url, avaliacao_media, disponivel) VALUES
 ('1984', 'George Orwell', 'Companhia das Letras', 'Ficção Distópica', 1949, 408, 'Português', null, 'Uma sátira profética sobre um regime totalitário que controla todos os aspectos da vida, incluindo o pensamento.', 'https://www.lpm.com.br/livros/imagens/1984_pocket_corrigido_9786556662121_hd.jpg', 4.9, TRUE),
 ('A Divina Comédia', 'Dante Alighieri', 'Ateliê Editorial', 'Clássico da Literatura', 1320, 560, 'Português', NULL, 'Poema épico que descreve a jornada de Dante pelo Inferno, Purgatório e Paraíso.', 'https://m.media-amazon.com/images/I/818Hap7wCcL._UF1000,1000_QL80_.jpg', 4.7, TRUE),
 ('A Peregrina', 'John Bunyan', 'Camelot Editora', 'Literatura Religiosa', 1684, 128, 'Português', null, 'Narra a jornada de uma família cristã em busca da Cidade Celestial, encontrando figuras simbólicas pelo caminho.', 'https://m.media-amazon.com/images/I/91ETpgC6ljL._UF1000,1000_QL80_.jpg', 5.0, TRUE),
