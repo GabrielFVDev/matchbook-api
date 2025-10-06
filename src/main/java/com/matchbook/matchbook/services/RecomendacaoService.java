@@ -29,23 +29,25 @@ public class RecomendacaoService {
     @Autowired
     LivroAceitoRepository livroAceitoRepository;
 
-    // Algoritmo original simples
     public List<LivroEntity> getRecomendacoesUsuario(Integer usuarioId) {
         UsuarioEntity usuario = usuarioRepository.findById(usuarioId)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
         List<LivroEntity> todosLivros = livroRepository.findAll();
         List<LivroRecusadoEntity> recusados = livroRecusadoRepository.findByIdUsuario(usuarioId);
+        List<LivroAceitoEntity> aceitos = livroAceitoRepository.findByIdUsuario(usuarioId);
+
         List<Integer> idsRecusados = recusados.stream().map(LivroRecusadoEntity::getIdLivro).toList();
+        List<Integer> idsAceitos = aceitos.stream().map(LivroAceitoEntity::getIdLivro).toList();
 
         List<LivroEntity> livrosFiltrados = todosLivros.stream()
                 .filter(livro -> !idsRecusados.contains(livro.getId()))
+                .filter(livro -> !idsAceitos.contains(livro.getId()))
                 .collect(Collectors.toList());
 
         return calcularRecomendacoes(usuario, livrosFiltrados);
     }
 
-    // Algoritmo adaptativo inteligente
     public List<LivroEntity> getRecomendacoesAdaptativas(Integer usuarioId) {
         UsuarioEntity usuario = usuarioRepository.findById(usuarioId)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
@@ -54,16 +56,13 @@ public class RecomendacaoService {
         List<LivroRecusadoEntity> recusados = livroRecusadoRepository.findByIdUsuario(usuarioId);
         List<LivroAceitoEntity> aceitos = livroAceitoRepository.findByIdUsuario(usuarioId);
 
-        // Análise de padrões
         Map<String, Double> preferenciasAprendidas = analisarPadroes(aceitos, recusados, todosLivros);
 
-        // Determinar estratégia baseada no histórico
         String estrategia = determinarEstrategia(recusados, aceitos);
 
         return aplicarEstrategiaRecomendacao(usuario, todosLivros, recusados, aceitos, preferenciasAprendidas, estrategia);
     }
 
-    // Registrar recusa com análise
     public Map<String, Object> recusarLivroComAnalise(Integer usuarioId, Integer livroId) {
         if (!livroRecusadoRepository.existsByIdUsuarioAndIdLivro(usuarioId, livroId)) {
             LivroRecusadoEntity recusa = new LivroRecusadoEntity();
@@ -72,7 +71,7 @@ public class RecomendacaoService {
             livroRecusadoRepository.save(recusa);
         }
 
-        // Analisar padrão da recusa
+        // Analisa padrão da recusa
         Map<String, Object> resultado = new HashMap<>();
         List<LivroRecusadoEntity> todasRecusas = livroRecusadoRepository.findByIdUsuario(usuarioId);
 
@@ -84,7 +83,6 @@ public class RecomendacaoService {
         return resultado;
     }
 
-    // Registrar aceitação
     public void aceitarLivro(Integer usuarioId, Integer livroId) {
         if (!livroAceitoRepository.existsByIdUsuarioAndIdLivro(usuarioId, livroId)) {
             LivroAceitoEntity aceite = new LivroAceitoEntity();
@@ -94,7 +92,6 @@ public class RecomendacaoService {
         }
     }
 
-    // Estatísticas do usuário
     public Map<String, Object> getEstatisticasRecomendacao(Integer usuarioId) {
         List<LivroRecusadoEntity> recusados = livroRecusadoRepository.findByIdUsuario(usuarioId);
         List<LivroAceitoEntity> aceitos = livroAceitoRepository.findByIdUsuario(usuarioId);
@@ -102,7 +99,7 @@ public class RecomendacaoService {
         Map<String, Object> stats = new HashMap<>();
         stats.put("totalRecusas", recusados.size());
         stats.put("totalAceites", aceitos.size());
-        stats.put("taxaAceitacao", aceitos.size() > 0 ?
+        stats.put("taxaAceitacao", !aceitos.isEmpty() ?
                 (double) aceitos.size() / (aceitos.size() + recusados.size()) * 100 : 0);
         stats.put("estrategiaAtual", determinarEstrategia(recusados, aceitos));
 
@@ -121,7 +118,6 @@ public class RecomendacaoService {
                                                 List<LivroEntity> todosLivros) {
         Map<String, Double> preferencias = new HashMap<>();
 
-        // Analisar gêneros aceitos
         Map<String, Integer> generosAceitos = new HashMap<>();
         Map<String, Integer> generosRecusados = new HashMap<>();
 
@@ -143,7 +139,6 @@ public class RecomendacaoService {
             }
         }
 
-        // Calcular preferências aprendidas
         for (String genero : generosAceitos.keySet()) {
             int aceitas = generosAceitos.get(genero);
             int recusas = generosRecusados.getOrDefault(genero, 0);
@@ -189,7 +184,6 @@ public class RecomendacaoService {
     }
 
     private List<LivroEntity> aplicarAlgoritmoExploratorio(List<LivroEntity> livros) {
-        // Algoritmo mais aleatório e diverso
         Collections.shuffle(livros);
         return livros.stream().limit(10).collect(Collectors.toList());
     }
@@ -217,7 +211,7 @@ public class RecomendacaoService {
         for (List<LivroEntity> livrosGenero : livrosPorGenero.values()) {
             livrosGenero.sort(Comparator.comparingDouble((LivroEntity livro) ->
                     calcularScoreRefinado(usuario, livro, preferenciasAprendidas)).reversed());
-            resultado.addAll(livrosGenero.stream().limit(porGenero).collect(Collectors.toList()));
+            resultado.addAll(livrosGenero.stream().limit(porGenero).toList());
         }
 
         return resultado;
@@ -234,7 +228,6 @@ public class RecomendacaoService {
         return score;
     }
 
-    // Métodos originais mantidos
     private List<LivroEntity> calcularRecomendacoes(UsuarioEntity usuario, List<LivroEntity> livros) {
         return livros.stream()
                 .filter(LivroEntity::isDisponivel)

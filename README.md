@@ -30,17 +30,10 @@ do usuário:
 
 ### 🔄 Processo de Adaptação
 
-```mermaid
-graph TD
-    A[Usuário recebe recomendação] --> B{Aceita ou Recusa?}
-    B -->|Aceita| C[Registra aceitação]
-    B -->|Recusa| D[Registra recusa]
-    C --> E[Analisa padrões aceitos]
-    D --> F[Analisa padrões recusados]
-    E --> G[Atualiza algoritmo]
-    F --> G
-    G --> H[Próximas recomendações adaptadas]
-```
+1. **Usuário recebe recomendação** → Aceita ou Recusa
+2. **Sistema registra interação** → Analisa padrões de comportamento
+3. **Algoritmo se adapta** → Muda estratégia baseada no histórico
+4. **Próximas recomendações** → Usa nova estratégia adaptada
 
 ### 🎲 Cálculo de Score
 
@@ -49,483 +42,206 @@ O sistema calcula um score para cada livro baseado em:
 - **40%** - Compatibilidade com gênero favorito
 - **30%** - Compatibilidade com autor preferido
 - **30%** - Adequação ao nível de leitura (páginas)
-- **+50%** - Boost das preferências aprendidas (algoritmo refinado)
 
-## 🚀 Como Executar
+## 🚀 Como Executar o Projeto
 
-### 🐳 Execução com Docker (Recomendado)
+### 📋 Pré-requisitos
 
-A forma mais simples de executar o projeto é usando Docker. O sistema já vem configurado com:
+- **Java 17** ou superior
+- **Maven 3.8+**
+- **Docker** e **Docker Compose**
+- **Git**
 
-- MySQL 8.0 com dados iniciais
-- Aplicação Spring Boot
-- Configuração de rede automática
-- Dados de exemplo pré-carregados
-
-#### Pré-requisitos Docker
-
-- Docker instalado e rodando
-- Docker Compose instalado
-
-#### Executar com Docker
-
-1. **Clone o repositório**
-   ```bash
-   git clone <repository-url>
-   cd matchbook
-   ```
-
-2. **Execute o script de build (Linux/Mac)**
-   ```bash
-   chmod +x docker-build.sh
-   ./docker-build.sh
-   ```
-
-3. **Ou execute manualmente os comandos Docker**
-   ```bash
-   # Compilar a aplicação
-   ./mvnw clean package -DskipTests
-   
-   # Limpar containers antigos
-   sudo docker compose down -v
-   
-   # Construir e iniciar
-   sudo docker compose up --build -d
-   ```
-
-4. **Verificar se está rodando**
-   ```bash
-   sudo docker compose ps
-   ```
-
-**✅ Aplicação estará disponível em:** `http://localhost:8080`  
-**📊 MySQL disponível na porta:** `3307`  
-**🗄️ Dados iniciais:** Carregados automaticamente!
-
-#### Comandos Docker Úteis
+### 🐧 Executando no Linux
 
 ```bash
-# Ver logs da aplicação
-sudo docker compose logs app -f
+# 1. Clonar o repositório
+git clone <url-do-repositorio>
+cd matchbook
 
-# Ver logs do MySQL
-sudo docker compose logs mysql -f
+# 2. Compilar o projeto
+./mvnw clean package -DskipTests
 
-# Parar a aplicação
-sudo docker compose down
+# 3. Subir com Docker Compose
+docker compose up --build
 
-# Parar e remover volumes (limpar dados)
-sudo docker compose down -v
-
-# Reiniciar apenas a aplicação
-sudo docker compose restart app
+# 4. Acessar a aplicação
+# API: http://localhost:8080
+# MySQL: localhost:3307
 ```
 
-#### Configuração Docker
+### 🪟 Executando no Windows
 
-O projeto utiliza:
+```cmd
+# 1. Clonar o repositório
+git clone <url-do-repositorio>
+cd matchbook
 
-- **MySQL**: Porta 3307, usuário `matchbook_user`, senha `matchbook_pass`
-- **Aplicação**: Porta 8080
-- **Volumes**: Dados MySQL persistidos
-- **Rede**: `matchbook-network` para comunicação entre containers
-- **Health Check**: MySQL aguarda estar pronto antes da aplicação iniciar
-- **Encoding**: UTF-8 (suporte a acentos) configurado automaticamente
+# 2. Compilar o projeto
+mvnw.cmd clean package -DskipTests
 
-### 💻 Execução Local (Desenvolvimento)
+# 3. Subir com Docker Compose
+docker compose up --build
 
-#### Pré-requisitos Locais
-
-- Java 17+
-- MySQL 8.0+
-- Maven 3.8+
-
-#### Configuração Local
-
-1. **Configure o banco MySQL local**
-   ```sql
-   CREATE DATABASE matchbook;
-   CREATE USER 'matchbook_user'@'localhost' IDENTIFIED BY 'matchbook_pass';
-   GRANT ALL PRIVILEGES ON matchbook.* TO 'matchbook_user'@'localhost';
-   FLUSH PRIVILEGES;
-   ```
-
-2. **Ajuste application.properties para local**
-   ```properties
-   spring.datasource.url=jdbc:mysql://localhost:3306/matchbook
-   spring.datasource.username=matchbook_user
-   spring.datasource.password=matchbook_pass
-   ```
-
-3. **Execute a aplicação**
-   ```bash
-   ./mvnw spring-boot:run
-   ```
-
-### 🔧 Solução de Problemas Docker
-
-#### Problema: "docker-compose: comando não encontrado"
-
-```bash
-# Instalar Docker Compose (Ubuntu/Debian)
-sudo apt update
-sudo apt install docker-compose-plugin
-
-# Ou use 'docker compose' (sem hífen) em versões mais novas
-sudo docker compose up --build -d
+# 4. Acessar a aplicação
+# API: http://localhost:8080
+# MySQL: localhost:3307
 ```
 
-#### Problema: "Cannot connect to the Docker daemon"
+### 🐳 Executando com Docker
+
+O projeto inclui configuração completa do Docker Compose que sobe:
+
+- **MySQL 8.0** na porta 3307
+- **Spring Boot App** na porta 8080
+- **Dados iniciais** carregados automaticamente
 
 ```bash
-# Verificar se Docker está rodando
-sudo systemctl status docker
+# Subir os serviços
+docker compose up --build
 
-# Iniciar Docker se necessário
-sudo systemctl start docker
+# Parar os serviços
+docker compose down
 
-# Adicionar usuário ao grupo docker (opcional, evita sudo)
-sudo usermod -aG docker $USER
-# (necessário logout/login após este comando)
-```
+# Ver logs
+docker compose logs -f
 
-#### Problema: Dados não carregaram
-
-```bash
-# Verificar se init-data.sql foi executado
-sudo docker compose logs mysql | grep -i "init-data"
-
-# Recriar containers com volumes limpos
-sudo docker compose down -v
-sudo docker compose up --build -d
+# Rebuild completo
+docker compose down && docker compose up --build
 ```
 
 ## 📡 API Endpoints
 
 ### 👤 Usuários
 
-#### `POST /api/usuario/create`
-
-**Descrição:** Cria um novo usuário no sistema  
-**Body (JSON):**
-
-```json
-{
-  "nome": "Gabriel Silva",
-  "email": "gabriel@email.com",
-  "senha": "minhasenha123",
-  "dataNascimento": "1995-05-15",
-  "generoFavorito": "Ficção Científica",
-  "livrosLidos": 25,
-  "autorPreferido": "Isaac Asimov",
-  "nivelLeitura": "Avançado",
-  "receberRecomendacoes": true,
-  "biografia": "Leitor apaixonado por ficção científica"
-}
-```
-
-**Resposta:** Usuário criado com `foto_url` gerada automaticamente
-
-#### `PUT /api/usuario/update`
-
-**Descrição:** Atualiza dados de um usuário existente  
-**Body (JSON):** Mesmo formato do create, incluindo o `id`
-
-#### `PUT /api/usuario/{id}/foto`
-
-**Descrição:** Atualiza apenas a foto do usuário  
-**Parâmetros:** `id` (Integer) - ID do usuário  
-**Body (String):** URL da nova foto
-
-```json
-"https://exemplo.com/minha-foto.jpg"
-```
-
-#### `GET /api/usuario/get?id={id}`
-
-**Descrição:** Busca um usuário específico  
-**Parâmetros:** `id` (Integer) - ID do usuário
-
-#### `GET /api/usuario/all`
-
-**Descrição:** Lista todos os usuários cadastrados
-
-#### `DELETE /api/usuario/delete?id={id}`
-
-**Descrição:** Remove um usuário do sistema  
-**Parâmetros:** `id` (Integer) - ID do usuário
+| Método | Endpoint            | Descrição                |
+|--------|---------------------|--------------------------|
+| GET    | `/api/usuario`      | Listar todos os usuários |
+| GET    | `/api/usuario/{id}` | Buscar usuário por ID    |
+| POST   | `/api/usuario`      | Criar novo usuário       |
+| PUT    | `/api/usuario/{id}` | Atualizar usuário        |
+| DELETE | `/api/usuario/{id}` | Deletar usuário          |
 
 ### 📚 Livros
 
-#### `POST /api/livro/create`
+| Método | Endpoint                               | Descrição              |
+|--------|----------------------------------------|------------------------|
+| GET    | `/api/livro`                           | Listar todos os livros |
+| GET    | `/api/livro/{id}`                      | Buscar livro por ID    |
+| GET    | `/api/livro/recomendacoes/{usuarioId}` | Recomendações simples  |
+| POST   | `/api/livro`                           | Criar novo livro       |
+| PUT    | `/api/livro/{id}`                      | Atualizar livro        |
+| DELETE | `/api/livro/{id}`                      | Deletar livro          |
 
-**Descrição:** Cadastra um novo livro no sistema  
-**Body (JSON):**
+### 🤖 Sistema de Recomendação Adaptativa
 
-```json
-{
-  "titulo": "Fundação",
-  "autor": "Isaac Asimov",
-  "editora": "Aleph",
-  "genero": "Ficção Científica",
-  "anoPublicacao": 1951,
-  "numeroPaginas": 244,
-  "idioma": "Português",
-  "isbn": "978-85-7665-389-8",
-  "sinopse": "A saga épica da Fundação...",
-  "capaUrl": "https://exemplo.com/capa.jpg",
-  "disponivel": true
-}
+| Método | Endpoint                                           | Descrição                          |
+|--------|----------------------------------------------------|------------------------------------|
+| GET    | `/api/recomendacao/getRecomendacao/{id}`           | Recomendações algoritmo original   |
+| GET    | `/api/recomendacao/getRecomendacaoAdaptativa/{id}` | Recomendações algoritmo adaptativo |
+| POST   | `/api/recomendacao/aceitar`                        | Aceitar recomendação               |
+| POST   | `/api/recomendacao/recusar`                        | Recusar recomendação               |
+| GET    | `/api/recomendacao/estatisticas/{id}`              | Estatísticas do usuário            |
+| POST   | `/api/recomendacao/resetarAlgoritmo/{id}`          | Resetar histórico do usuário       |
+
+### 💚 Livros Curtidos
+
+| Método | Endpoint                        | Descrição              |
+|--------|---------------------------------|------------------------|
+| GET    | `/api/livro-aceito/{usuarioId}` | Listar livros curtidos |
+| POST   | `/api/livro-aceito`             | Curtir livro           |
+| DELETE | `/api/livro-aceito`             | Descurtir livro        |
+
+## 📊 Exemplos de Uso
+
+### Aceitar uma Recomendação
+
+```bash
+curl -X POST "http://localhost:8080/api/recomendacao/aceitar" \
+  -d "idUsuario=1&idLivro=5"
 ```
 
-#### `PUT /api/livro/update`
+### Recusar uma Recomendação
 
-**Descrição:** Atualiza dados de um livro existente  
-**Body (JSON):** Mesmo formato do create, incluindo o `id`
-
-#### `GET /api/livro/get?id={id}`
-
-**Descrição:** Busca um livro específico  
-**Parâmetros:** `id` (Integer) - ID do livro
-
-#### `GET /api/livro/all`
-
-**Descrição:** Lista todos os livros cadastrados
-
-#### `DELETE /api/livro/delete?id={id}`
-
-**Descrição:** Remove um livro do sistema  
-**Parâmetros:** `id` (Integer) - ID do livro
-
-### 🎯 Recomendações
-
-#### `GET /api/recomendacao/getRecomendacao/{idUsuario}`
-
-**Descrição:** Retorna recomendações usando o algoritmo original  
-**Parâmetros:** `idUsuario` (Integer) - ID do usuário  
-**Resposta:** Lista de livros recomendados
-
-```json
-[
-  {
-    "id": 1,
-    "titulo": "1984",
-    "autor": "George Orwell",
-    "genero": "Ficção Científica",
-    "numeroPaginas": 328,
-    "disponivel": true
-  }
-]
+```bash
+curl -X POST "http://localhost:8080/api/recomendacao/recusar" \
+  -d "idUsuario=1&idLivro=3"
 ```
 
-#### `GET /api/recomendacao/getRecomendacaoAdaptativa/{idUsuario}`
+### Ver Estatísticas do Algoritmo
 
-**Descrição:** Retorna recomendações usando algoritmo adaptativo inteligente  
-**Parâmetros:** `idUsuario` (Integer) - ID do usuário  
-**Resposta:** Lista de livros com recomendações adaptadas ao comportamento
-
-### 📝 Feedback do Usuário
-
-#### `POST /api/recomendacao/recusar`
-
-**Descrição:** Registra que o usuário recusou um livro  
-**Parâmetros:**
-
-- `idUsuario` (Integer) - ID do usuário
-- `idLivro` (Integer) - ID do livro recusado
+```bash
+curl "http://localhost:8080/api/recomendacao/estatisticas/1"
+```
 
 **Resposta:**
 
 ```json
 {
   "totalRecusas": 7,
-  "algoritmoAlterado": true,
-  "sugestao": "Algoritmo será mais exploratório"
-}
-```
-
-#### `POST /api/recomendacao/aceitar`
-
-**Descrição:** Registra que o usuário aceitou um livro  
-**Parâmetros:**
-
-- `idUsuario` (Integer) - ID do usuário
-- `idLivro` (Integer) - ID do livro aceito
-
-**Resposta:** `200 OK`
-
-### 📊 Estatísticas e Análises
-
-#### `GET /api/recomendacao/estatisticas/{idUsuario}`
-
-**Descrição:** Retorna estatísticas detalhadas do usuário  
-**Parâmetros:** `idUsuario` (Integer) - ID do usuário
-
-**Resposta:**
-
-```json
-{
-  "totalRecusas": 7,
-  "totalAceites": 3,
-  "taxaAceitacao": 30.0,
+  "totalAceites": 2,
+  "taxaAceitacao": 22.22,
   "estrategiaAtual": "DIVERSIFICADO"
 }
 ```
 
-### 🔄 Utilitários
-
-#### `POST /api/recomendacao/resetarAlgoritmo/{idUsuario}`
-
-**Descrição:** Reseta todo histórico de recusas e aceitações do usuário  
-**Parâmetros:** `idUsuario` (Integer) - ID do usuário  
-**Resposta:** `200 OK`
-
-## 🗃️ Estrutura das Tabelas MySQL
-
-### `usuario`
-
-| Campo | Tipo | Descrição |
-|-----------------------|--------------|------------------- --------------|
-| id | INT (PK, AI) | Identificador do usuário |
-| nome | VARCHAR(100) | Nome completo |
-| email | VARCHAR(100) | E-mail do usuário |
-| senha | VARCHAR(255) | Senha do usuário |
-| data_nascimento | VARCHAR(50)  | Data de nascimento |
-| genero_favorito | VARCHAR(50)  | Gênero literário preferido |
-| livros_lidos | INT | Quantidade de livros já lidos |
-| autor_preferido | VARCHAR(100) | Autor preferido |
-| nivel_leitura | VARCHAR(50)  | Nível de leitura do usuário |
-| receber_recomendacoes | BOOLEAN | Se deseja receber recomendações |
-| data_cadastro | Date | Quando foi cadastrado |
-| foto_url | VARCHAR(500) | URL da foto do usuário |
-
-### `livro`
-
-| Campo          | Tipo         | Descrição               |
-|----------------|--------------|-------------------------|
-| id             | INT (PK, AI) | Identificador do livro  |
-| titulo         | VARCHAR(200) | Título do livro         |
-| autor          | VARCHAR(100) | Autor do livro          |
-| editora        | VARCHAR(100) | Editora do livro        |
-| genero         | VARCHAR(50)  | Gênero do livro         |
-| ano_publicacao | INT          | Ano de publicação       |![img.png](img.png)
-| numero_paginas | INT          | Número de páginas       |
-| idioma         | VARCHAR(50)  | Idioma do livro         |
-| isbn           | VARCHAR(20)  | Código ISBN             |
-| sinopse        | TEXT         | Sinopse/resumo do livro |
-| capa_url       | VARCHAR(500) | URL da imagem da capa   |
-
-### `livro_recusado`
-
-| Campo       | Tipo         | Descrição                 |
-|-------------|--------------|---------------------------|
-| id          | INT (PK, AI) | Identificador do registro |
-| id_usuario  | INT (FK)     | Referência ao usuário     |
-| id_livro    | INT (FK)     | Referência ao livro       |
-| data_recusa | TIMESTAMP    | Data/hora da recusa       |
-
-### `livro_aceito`
-
-| Campo       | Tipo         | Descrição                 |
-|-------------|--------------|---------------------------|
-| id          | INT (PK, AI) | Identificador do registro |
-| id_usuario  | INT (FK)     | Referência ao usuário     |
-| id_livro    | INT (FK)     | Referência ao livro       |
-| data_aceite | TIMESTAMP    | Data/hora da aceitação    |
-
-> ⭐ Estas são as tabelas-chave que permitem o aprendizado adaptativo
-
-## 🎯 Fluxo de Uso Típico
-
-### Cenário 1: Usuário Novo
-
-```
-1. Usuário faz cadastro com preferências básicas
-2. Recebe recomendações baseadas no perfil (PADRÃO)
-3. Sistema monitora aceites/recusas
-4. Após 3+ aceites → Muda para REFINADO
-```
-
-### Cenário 2: Usuário com Muitas Recusas
-
-```
-1. Usuário recusa 5+ livros → Algoritmo vira DIVERSIFICADO
-2. Sistema oferece variedade maior de gêneros
-3. Se continuar recusando (10+) → Vira EXPLORATÓRIO
-4. Recomendações ficam mais aleatórias para quebrar padrão
-```
-
-### Cenário 3: Reset e Recomeço
-
-```
-1. Usuário pode resetar histórico via endpoint
-2. Algoritmo volta ao estado PADRÃO
-3. Processo de aprendizado recomeça
-```
-
-## 🧪 Exemplos de Teste
-
-### Testando Recomendações Adaptativas
+### Obter Recomendações Adaptativas
 
 ```bash
-# 1. Obter recomendações iniciais
-curl -X GET "http://localhost:8080/api/recomendacao/getRecomendacaoAdaptativa/1"
-
-# 2. Recusar alguns livros
-curl -X POST "http://localhost:8080/api/recomendacao/recusar?idUsuario=1&idLivro=5"
-curl -X POST "http://localhost:8080/api/recomendacao/recusar?idUsuario=1&idLivro=8"
-
-# 3. Verificar mudanças nas estatísticas
-curl -X GET "http://localhost:8080/api/recomendacao/estatisticas/1"
-
-# 4. Obter novas recomendações (agora adaptadas)
-curl -X GET "http://localhost:8080/api/recomendacao/getRecomendacaoAdaptativa/1"
+curl "http://localhost:8080/api/recomendacao/getRecomendacaoAdaptativa/1"
 ```
 
-## 🔧 Tecnologias Utilizadas
+## 🗄️ Estrutura do Banco de Dados
 
-- **Spring Boot 3.5.6** - Framework principal
-- **Spring Data JPA** - Persistência de dados
-- **MySQL** - Banco de dados
-- **Maven** - Gerenciamento de dependências
-- **Java 17** - Linguagem de programação
+### Tabelas Principais
 
-## 🎨 Arquitetura
+- **usuarios** - Dados dos usuários e preferências
+- **livros** - Catálogo de livros disponíveis
+- **livros_aceitos** - Histórico de livros curtidos
+- **livros_recusados** - Histórico de livros recusados
 
+### Dados Iniciais
+
+O sistema vem com 30 livros pré-cadastrados e usuários de exemplo para teste.
+
+## 🔧 Configuração
+
+### Variáveis de Ambiente (Docker)
+
+- `SPRING_DATASOURCE_URL` - URL do banco MySQL
+- `SPRING_DATASOURCE_USERNAME` - Usuário do banco
+- `SPRING_DATASOURCE_PASSWORD` - Senha do banco
+- `SPRING_JPA_HIBERNATE_DDL_AUTO` - Configuração do Hibernate
+
+### application.properties
+
+```properties
+spring.datasource.url=jdbc:mysql://localhost:3307/matchbook
+spring.datasource.username=matchbook_user
+spring.datasource.password=matchbook_pass
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
 ```
-📦 matchbook
-├── 🎛️ controllers/     # Endpoints REST
-├── 🧩 services/        # Lógica de negócio e algoritmos
-├── 🗃️ entities/        # Entidades JPA
-├── 📊 repositories/    # Acesso a dados
-└── ⚙️ configuration/   # Configurações (CORS, etc.)
-```
 
-## 🚧 Próximas Melhorias
+## 🧪 Testando o Sistema
 
-- [ ] Machine Learning para análise de padrões mais complexos
-- [ ] Recomendações baseadas em usuários similares
-- [ ] Sistema de tags e categorias mais granular
-- [ ] API de avaliações (estrelas) para refinar algoritmo
-- [ ] Dashboard analytics para administradores
-- [ ] Cache de recomendações para melhor performance
-
-## 📄 Licença
-
-Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalhes.
-
----
+1. **Criar um usuário** via POST `/api/usuario`
+2. **Obter recomendações** via GET `/api/recomendacao/getRecomendacaoAdaptativa/{id}`
+3. **Aceitar/Recusar livros** para treinar o algoritmo
+4. **Ver como o algoritmo se adapta** via GET `/api/recomendacao/estatisticas/{id}`
 
 ## 🤝 Contribuição
 
-Contribuições são bem-vindas! Por favor, abra uma issue primeiro para discutir mudanças maiores.
-
 1. Fork o projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
-3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
-4. Push para a branch (`git push origin feature/AmazingFeature`)
+2. Crie uma branch para sua feature
+3. Commit suas mudanças
+4. Push para a branch
 5. Abra um Pull Request
+
+## 📝 Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo LICENSE para mais detalhes.
 
 ---
 
-**Desenvolvido com ❤️ usando Spring Boot**
+**Desenvolvido com ❤️ usando Spring Boot + Docker + Algoritmos Adaptativos**

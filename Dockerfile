@@ -1,5 +1,5 @@
-FROM ubuntu:latest
 FROM openjdk:17-jdk-slim
+
 LABEL authors="gabriel"
 
 WORKDIR /app
