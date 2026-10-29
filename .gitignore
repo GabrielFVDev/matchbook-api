@@ -50,3 +50,6 @@ docker-compose.override.yml
 
 # Arquivos de ambiente
 .env
+
+# Configuração local (tem a senha do banco). O modelo é o application.properties.example
+src/main/resources/application.properties
