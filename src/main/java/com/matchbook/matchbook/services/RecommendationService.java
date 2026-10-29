@@ -5,10 +5,11 @@ import com.matchbook.matchbook.models.BookReactionModel;
 import com.matchbook.matchbook.models.ReactionType;
 import com.matchbook.matchbook.models.UserPreferencesModel;
 import com.matchbook.matchbook.repositories.BookReactionRepository;
-import com.matchbook.matchbook.repositories.BookRepository;
 import com.matchbook.matchbook.repositories.UserPreferencesRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.*;
@@ -18,21 +19,22 @@ import java.util.stream.Collectors;
 @Service
 public class RecommendationService {
 
-    private final BookRepository bookRepository;
+    private final BookService bookService;
     private final UserPreferencesRepository userPreferencesRepository;
     private final BookReactionRepository bookReactionRepository;
 
-    public RecommendationService(BookRepository bookRepository,
+    public RecommendationService(BookService bookService,
                                  UserPreferencesRepository userPreferencesRepository,
                                  BookReactionRepository bookReactionRepository) {
-        this.bookRepository = bookRepository;
+        this.bookService = bookService;
         this.userPreferencesRepository = userPreferencesRepository;
         this.bookReactionRepository = bookReactionRepository;
     }
 
+    // Recommendations only draw from the books the user can see (see BookService)
     public List<BookModel> getUserRecommendations(String firebaseUid) {
         UserPreferencesModel preferences = findPreferences(firebaseUid);
-        List<BookModel> unseenBooks = filterUnseen(bookRepository.findAll(),
+        List<BookModel> unseenBooks = filterUnseen(bookService.getVisibleBooks(firebaseUid),
                 bookReactionRepository.findByFirebaseUid(firebaseUid));
 
         return calculateRecommendations(preferences, unseenBooks);
@@ -40,7 +42,7 @@ public class RecommendationService {
 
     public List<BookModel> getAdaptiveRecommendations(String firebaseUid) {
         UserPreferencesModel preferences = findPreferences(firebaseUid);
-        List<BookModel> allBooks = bookRepository.findAll();
+        List<BookModel> allBooks = bookService.getVisibleBooks(firebaseUid);
         List<BookReactionModel> reactions = bookReactionRepository.findByFirebaseUid(firebaseUid);
 
         Map<String, Double> learnedPreferences = analyzePatterns(reactions, allBooks);
@@ -103,8 +105,12 @@ public class RecommendationService {
         return userPreferencesRepository.findById(firebaseUid).orElseGet(UserPreferencesModel::new);
     }
 
-    // Reacting again to the same book replaces the previous reaction
+    // Reacting again to the same book replaces the previous reaction.
+    // Only books the user can see: otherwise someone else's book would leak into "My books".
     private void saveReaction(String firebaseUid, Integer bookId, ReactionType type) {
+        bookService.getBook(firebaseUid, bookId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
         BookReactionModel reaction = bookReactionRepository.findByFirebaseUidAndBookId(firebaseUid, bookId)
                 .orElseGet(BookReactionModel::new);
         reaction.setFirebaseUid(firebaseUid);

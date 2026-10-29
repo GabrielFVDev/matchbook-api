@@ -15,6 +15,7 @@ CREATE TABLE books (
     language VARCHAR(20) DEFAULT 'Português',
     synopsis TEXT,
     cover_url VARCHAR(500),
+    owner_uid VARCHAR(128),
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

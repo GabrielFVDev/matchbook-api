@@ -46,6 +46,10 @@ public class BookModel {
     @Column(name = "photo_url")
     private String photoUrl;
 
+    // Firebase uid of whoever created the book. Null for the shared books from the seed.
+    @Column(name = "owner_uid", length = 128)
+    private String ownerUid;
+
     public int getId() {
         return id;
     }
@@ -140,5 +144,13 @@ public class BookModel {
 
     public void setPhotoUrl(String photoUrl) {
         this.photoUrl = photoUrl;
+    }
+
+    public String getOwnerUid() {
+        return ownerUid;
+    }
+
+    public void setOwnerUid(String ownerUid) {
+        this.ownerUid = ownerUid;
     }
 }

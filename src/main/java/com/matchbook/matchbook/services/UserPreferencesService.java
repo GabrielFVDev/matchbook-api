@@ -24,8 +24,4 @@ public class UserPreferencesService {
         preferences.setFirebaseUid(firebaseUid);
         return userPreferencesRepository.save(preferences);
     }
-
-    public void deletePreferences(String firebaseUid) {
-        userPreferencesRepository.deleteById(firebaseUid);
-    }
 }

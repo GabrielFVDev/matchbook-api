@@ -7,7 +7,6 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
-// The logged-in user's preferences. The uid is the "sub" of the Firebase token.
 @RestController
 @RequestMapping("/api/me/preferences")
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -30,11 +29,5 @@ public class UserPreferencesController {
             @RequestBody UserPreferencesModel preferences
     ) {
         return ResponseEntity.ok(userPreferencesService.savePreferences(token.getSubject(), preferences));
-    }
-
-    @DeleteMapping
-    public ResponseEntity<Void> deletePreferences(@AuthenticationPrincipal Jwt token) {
-        userPreferencesService.deletePreferences(token.getSubject());
-        return ResponseEntity.noContent().build();
     }
 }
