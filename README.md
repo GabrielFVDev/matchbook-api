@@ -1,247 +1,126 @@
-# 📚 Matchbook - Sistema de Recomendação Adaptativa de Livros
+# Matchbook API
 
-![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.5.6-brightgreen)
-![Java](https://img.shields.io/badge/Java-17-blue)
-![MySQL](https://img.shields.io/badge/MySQL-8.0-orange)
-![Maven](https://img.shields.io/badge/Maven-3.8+-red)
-![Docker](https://img.shields.io/badge/Docker-🐳-blue)
+API de recomendação de livros que aprende com o comportamento do usuário: a cada livro aceito ou recusado, o algoritmo ajusta as próximas sugestões.
 
-## 🎯 Sobre o Projeto
+## Stack
 
-O **Matchbook** é um sistema inteligente de recomendação de livros que utiliza algoritmos adaptativos para sugerir
-livros baseados no comportamento e preferências do usuário. O diferencial do sistema está na sua capacidade de *
-*aprender e se adaptar** conforme o usuário aceita ou recusa recomendações.
+- Java 17
+- Spring Boot 3.5 (Web, Data JPA, Validation, Security)
+- MySQL 8
+- Maven (wrapper incluso)
+- Firebase Auth (todas as rotas exigem token JWT do Firebase)
+- Docker + Docker Compose
 
-## 🧠 Algoritmo de Recomendação Adaptativa
+## Como rodar
 
-### Como Funciona
+### Com Docker (recomendado)
 
-O sistema implementa **4 estratégias diferentes** que são aplicadas automaticamente baseadas no histórico de interações
-do usuário:
-
-#### 📊 **Estratégias de Recomendação**
-
-| Estratégia        | Condição      | Comportamento                                        |
-|-------------------|---------------|------------------------------------------------------|
-| **PADRÃO**        | 0-4 recusas   | Algoritmo original baseado em preferências do perfil |
-| **DIVERSIFICADO** | 5-9 recusas   | Mistura preferências com diversidade de gêneros      |
-| **EXPLORATÓRIO**  | 10+ recusas   | Recomendações aleatórias para quebrar padrões ruins  |
-| **REFINADO**      | 3+ aceitações | Foca nas preferências aprendidas pelo comportamento  |
-
-### 🔄 Processo de Adaptação
-
-1. **Usuário recebe recomendação** → Aceita ou Recusa
-2. **Sistema registra interação** → Analisa padrões de comportamento
-3. **Algoritmo se adapta** → Muda estratégia baseada no histórico
-4. **Próximas recomendações** → Usa nova estratégia adaptada
-
-### 🎲 Cálculo de Score
-
-O sistema calcula um score para cada livro baseado em:
-
-- **40%** - Compatibilidade com gênero favorito
-- **30%** - Compatibilidade com autor preferido
-- **30%** - Adequação ao nível de leitura (páginas)
-
-## 🚀 Como Executar o Projeto
-
-### 📋 Pré-requisitos
-
-- **Java 17** ou superior
-- **Maven 3.8+**
-- **Docker** e **Docker Compose**
-- **Git**
-
-### 🐧 Executando no Linux
+É preciso ter JDK 17 instalado só para compilar. Os serviços (app + banco) sobem via Docker.
 
 ```bash
-# 1. Clonar o repositório
-git clone <url-do-repositorio>
-cd matchbook
-
-# 2. Compilar o projeto
+# 1. Compilar
 ./mvnw clean package -DskipTests
 
-# 3. Subir com Docker Compose
+# 2. Subir
 docker compose up --build
-
-# 4. Acessar a aplicação
-# API: http://localhost:8080
-# MySQL: localhost:3307
 ```
 
-### 🪟 Executando no Windows
-
-```cmd
-# 1. Clonar o repositório
-git clone <url-do-repositorio>
-cd matchbook
-
-# 2. Compilar o projeto
-mvnw.cmd clean package -DskipTests
-
-# 3. Subir com Docker Compose
-docker compose up --build
-
-# 4. Acessar a aplicação
-# API: http://localhost:8080
-# MySQL: localhost:3307
-```
-
-### 🐳 Executando com Docker
-
-O projeto inclui configuração completa do Docker Compose que sobe:
-
-- **MySQL 8.0** na porta 3307
-- **Spring Boot App** na porta 8080
-- **Dados iniciais** carregados automaticamente
+- API: http://localhost:8080
+- MySQL: `localhost:3307` (usuário `matchbook_user`, senha `matchbook_pass`)
+- O banco já sobe com 30 livros pré-cadastrados (`init-data.sql`)
 
 ```bash
-# Subir os serviços
-docker compose up --build
-
-# Parar os serviços
-docker compose down
-
-# Ver logs
-docker compose logs -f
-
-# Rebuild completo
-docker compose down && docker compose up --build
+docker compose down      # parar
+docker compose logs -f   # acompanhar logs
 ```
 
-## 📡 API Endpoints
-
-### 👤 Usuários
-
-| Método | Endpoint            | Descrição                |
-|--------|---------------------|--------------------------|
-| GET    | `/api/usuario`      | Listar todos os usuários |
-| GET    | `/api/usuario/{id}` | Buscar usuário por ID    |
-| POST   | `/api/usuario`      | Criar novo usuário       |
-| PUT    | `/api/usuario/{id}` | Atualizar usuário        |
-| DELETE | `/api/usuario/{id}` | Deletar usuário          |
-
-### 📚 Livros
-
-| Método | Endpoint                               | Descrição              |
-|--------|----------------------------------------|------------------------|
-| GET    | `/api/livro`                           | Listar todos os livros |
-| GET    | `/api/livro/{id}`                      | Buscar livro por ID    |
-| GET    | `/api/livro/recomendacoes/{usuarioId}` | Recomendações simples  |
-| POST   | `/api/livro`                           | Criar novo livro       |
-| PUT    | `/api/livro/{id}`                      | Atualizar livro        |
-| DELETE | `/api/livro/{id}`                      | Deletar livro          |
-
-### 🤖 Sistema de Recomendação Adaptativa
-
-| Método | Endpoint                                           | Descrição                          |
-|--------|----------------------------------------------------|------------------------------------|
-| GET    | `/api/recomendacao/getRecomendacao/{id}`           | Recomendações algoritmo original   |
-| GET    | `/api/recomendacao/getRecomendacaoAdaptativa/{id}` | Recomendações algoritmo adaptativo |
-| POST   | `/api/recomendacao/aceitar`                        | Aceitar recomendação               |
-| POST   | `/api/recomendacao/recusar`                        | Recusar recomendação               |
-| GET    | `/api/recomendacao/estatisticas/{id}`              | Estatísticas do usuário            |
-| POST   | `/api/recomendacao/resetarAlgoritmo/{id}`          | Resetar histórico do usuário       |
-
-### 💚 Livros Curtidos
-
-| Método | Endpoint                        | Descrição              |
-|--------|---------------------------------|------------------------|
-| GET    | `/api/livro-aceito/{usuarioId}` | Listar livros curtidos |
-| POST   | `/api/livro-aceito`             | Curtir livro           |
-| DELETE | `/api/livro-aceito`             | Descurtir livro        |
-
-## 📊 Exemplos de Uso
-
-### Aceitar uma Recomendação
+### Rodando local (sem o container da aplicação)
 
 ```bash
-curl -X POST "http://localhost:8080/api/recomendacao/aceitar" \
-  -d "idUsuario=1&idLivro=5"
+# 1. Sobe apenas o banco
+docker compose up mysql -d
+
+# 2. Cria a configuração a partir do exemplo
+cp src/main/resources/application.properties.example src/main/resources/application.properties
+#    - troque jdbc:mysql://mysql:3306/... por jdbc:mysql://localhost:3307/...
+#    - ajuste usuário e senha (por padrão do compose: matchbook_user / matchbook_pass)
+
+# 3. Informa o projeto Firebase
+export FIREBASE_PROJECT_ID=seu-projeto
+
+# 4. Roda a aplicação
+./mvnw spring-boot:run
 ```
 
-### Recusar uma Recomendação
+## Autenticação
+
+Todas as rotas `/api/**` exigem um ID token do Firebase validado no header:
+
+```
+Authorization: Bearer <idToken>
+```
+
+Não há `id` de usuário na URL: cada rota age sobre o usuário logado (o campo `sub` do token).
+
+## Endpoints
+
+### Livros — `/api/book`
+
+| Método | Rota             | Descrição                                       |
+|--------|------------------|-------------------------------------------------|
+| GET    | `/getAll`        | Lista os livros visíveis para o usuário         |
+| GET    | `/get?id=`       | Busca um livro                                  |
+| POST   | `/create`        | Cria um livro                                   |
+| PUT    | `/update`        | Atualiza um livro                               |
+| DELETE | `/delete?id=`    | Deleta um livro                                 |
+| GET    | `/liked`         | Lista os livros curtidos                        |
+| GET    | `/liked/count`   | Quantidade de livros curtidos                   |
+| DELETE | `/liked?bookId=` | Descurtir um livro                              |
+
+Só é possível atualizar ou deletar livros do próprio usuário.
+
+### Recomendações — `/api/recommendation`
+
+| Método | Rota                        | Descrição                                                |
+|--------|-----------------------------|----------------------------------------------------------|
+| GET    | `/getRecommendation`        | Recomendações do algoritmo padrão                        |
+| GET    | `/getAdaptiveRecommendation`| Recomendações do algoritmo adaptativo                    |
+| POST   | `/accept?bookId=`           | Aceita (curte) um livro                                  |
+| POST   | `/reject?bookId=`           | Recusa um livro e retorna a análise do padrão de recusas |
+| GET    | `/statistics`               | Recusas, aceites e estratégia atual do algoritmo         |
+| POST   | `/resetAlgorithm`           | Apaga todo o histórico de interações do usuário          |
+
+### Perfil — `/api/me`
+
+| Método | Rota                 | Descrição                                                                   |
+|--------|----------------------|-----------------------------------------------------------------------------|
+| GET    | `/preferences`       | Preferências do usuário                                                     |
+| PUT    | `/preferences`       | Salva as preferências                                                       |
+| DELETE | `/`                  | Apaga os dados do usuário (chamar antes de excluir a conta no Firebase)     |
+
+## Algoritmo adaptativo
+
+O score de cada livro considera: 40% compatibilidade com o gênero favorito, 30% com o autor preferido e 30% adequação ao nível de leitura (páginas).
+
+Com base no histórico de aceites e recusas, o sistema escolhe a estratégia da próxima rodada:
+
+| Estratégia    | Quando                          | O que faz                                              |
+|---------------|---------------------------------|--------------------------------------------------------|
+| `DEFAULT`     | menos de 5 recusas (< 3 aceites)| Score normal pelas preferências do perfil              |
+| `DIVERSIFIED` | 5 a 9 recusas                   | Mistura as preferências com gêneros variados           |
+| `REFINED`     | 3 ou mais aceites               | Prioriza os gostos aprendidos com o comportamento (50% do score) |
+| `EXPLORATORY` | 10 ou mais recusas              | Livros aleatórios, para quebrar o padrão               |
+
+A verificação segue essa ordem: `EXPLORATORY` > `REFINED` > `DIVERSIFIED` > `DEFAULT`. Ou seja, com 10+ recusas e 3+ aceites, vence a estratégia exploratória.
+
+## Exemplo de uso
 
 ```bash
-curl -X POST "http://localhost:8080/api/recomendacao/recusar" \
-  -d "idUsuario=1&idLivro=3"
+# Aceitar uma recomendação
+curl -X POST "http://localhost:8080/api/recommendation/accept?bookId=5" \
+  -H "Authorization: Bearer $TOKEN"
+
+# Ver as estatísticas do algoritmo
+curl "http://localhost:8080/api/recommendation/statistics" \
+  -H "Authorization: Bearer $TOKEN"
 ```
-
-### Ver Estatísticas do Algoritmo
-
-```bash
-curl "http://localhost:8080/api/recomendacao/estatisticas/1"
-```
-
-**Resposta:**
-
-```json
-{
-  "totalRecusas": 7,
-  "totalAceites": 2,
-  "taxaAceitacao": 22.22,
-  "estrategiaAtual": "DIVERSIFICADO"
-}
-```
-
-### Obter Recomendações Adaptativas
-
-```bash
-curl "http://localhost:8080/api/recomendacao/getRecomendacaoAdaptativa/1"
-```
-
-## 🗄️ Estrutura do Banco de Dados
-
-### Tabelas Principais
-
-- **usuarios** - Dados dos usuários e preferências
-- **livros** - Catálogo de livros disponíveis
-- **livros_aceitos** - Histórico de livros curtidos
-- **livros_recusados** - Histórico de livros recusados
-
-### Dados Iniciais
-
-O sistema vem com 30 livros pré-cadastrados e usuários de exemplo para teste.
-
-## 🔧 Configuração
-
-### Variáveis de Ambiente (Docker)
-
-- `SPRING_DATASOURCE_URL` - URL do banco MySQL
-- `SPRING_DATASOURCE_USERNAME` - Usuário do banco
-- `SPRING_DATASOURCE_PASSWORD` - Senha do banco
-- `SPRING_JPA_HIBERNATE_DDL_AUTO` - Configuração do Hibernate
-
-### application.properties
-
-```properties
-spring.datasource.url=jdbc:mysql://localhost:3307/matchbook
-spring.datasource.username=matchbook_user
-spring.datasource.password=matchbook_pass
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true
-```
-
-## 🧪 Testando o Sistema
-
-1. **Criar um usuário** via POST `/api/usuario`
-2. **Obter recomendações** via GET `/api/recomendacao/getRecomendacaoAdaptativa/{id}`
-3. **Aceitar/Recusar livros** para treinar o algoritmo
-4. **Ver como o algoritmo se adapta** via GET `/api/recomendacao/estatisticas/{id}`
-
-## 🤝 Contribuição
-
-1. Fork o projeto
-2. Crie uma branch para sua feature
-3. Commit suas mudanças
-4. Push para a branch
-5. Abra um Pull Request
-
-## 📝 Licença
-
-Este projeto está sob a licença MIT. Veja o arquivo LICENSE para mais detalhes.
-
----
-
-**Desenvolvido com ❤️ usando Spring Boot + Docker + Algoritmos Adaptativos**
