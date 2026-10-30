@@ -240,8 +240,9 @@ public class RecommendationService {
         return score;
     }
 
-    private double calculateReadingLevelScore(String readingLevel, int pageCount) {
-        if (readingLevel == null) {
+    // A book without a page count gets no reading-level weight: its size is unknown.
+    private double calculateReadingLevelScore(String readingLevel, Integer pageCount) {
+        if (readingLevel == null || pageCount == null) {
             return 0.0;
         }
 

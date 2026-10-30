@@ -24,11 +24,12 @@ public class BookModel {
     @Column(name = "genre")
     private String genre;
 
+    // Null when left blank: a 0 would read as a real value (0 pages counts as a short book).
     @Column(name = "publication_year")
-    private int publicationYear;
+    private Integer publicationYear;
 
     @Column(name = "page_count")
-    private int pageCount;
+    private Integer pageCount;
 
     @Column(name = "language")
     private String language;
@@ -90,19 +91,19 @@ public class BookModel {
         this.genre = genre;
     }
 
-    public int getPublicationYear() {
+    public Integer getPublicationYear() {
         return publicationYear;
     }
 
-    public void setPublicationYear(int publicationYear) {
+    public void setPublicationYear(Integer publicationYear) {
         this.publicationYear = publicationYear;
     }
 
-    public int getPageCount() {
+    public Integer getPageCount() {
         return pageCount;
     }
 
-    public void setPageCount(int pageCount) {
+    public void setPageCount(Integer pageCount) {
         this.pageCount = pageCount;
     }
 
