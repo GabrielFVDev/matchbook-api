@@ -18,10 +18,14 @@ API de recomendação de livros que aprende com o comportamento do usuário: a c
 É preciso ter JDK 17 instalado só para compilar. Os serviços (app + banco) sobem via Docker.
 
 ```bash
-# 1. Compilar
+# 1. Informa o projeto Firebase (o .env fica fora do git)
+cp .env.example .env
+#    - preencha FIREBASE_PROJECT_ID com o projectId do firebaseConfig do front
+
+# 2. Compilar
 ./mvnw clean package -DskipTests
 
-# 2. Subir
+# 3. Subir
 docker compose up --build
 ```
 

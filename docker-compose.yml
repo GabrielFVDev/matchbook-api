@@ -34,6 +34,7 @@ services:
       SPRING_DATASOURCE_USERNAME: matchbook_user
       SPRING_DATASOURCE_PASSWORD: matchbook_pass
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      FIREBASE_PROJECT_ID: ${FIREBASE_PROJECT_ID}
     networks:
       - matchbook-network
     restart: on-failure
