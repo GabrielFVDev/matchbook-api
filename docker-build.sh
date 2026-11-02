@@ -1,12 +1,9 @@
 #!/bin/bash
 
-echo "🔧 Compilando aplicação Maven..."
-./mvnw clean package -DskipTests
-
 echo "🗑️ Limpando containers antigos..."
 sudo docker compose down -v
 
-echo "🐳 Construindo imagem Docker..."
+echo "🐳 Construindo imagem Docker (compila o projeto dentro dela)..."
 sudo docker compose build
 
 echo "🚀 Iniciando containers..."
