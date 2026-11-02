@@ -1,10 +1,8 @@
 target/
-!target/*.jar
 .git
 .gitignore
+.env
 README.md
 Dockerfile
 .dockerignore
-.mvn
-mvnw
 mvnw.cmd
